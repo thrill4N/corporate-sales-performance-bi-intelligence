@@ -1,83 +1,58 @@
-Markdown
-# Enterprise Business Intelligence Solution: Sales & Strategy Performance Dashboard
+# Corporate Sales Performance BI Intelligence
 
-## 📊 Business Case, Positioning & Impact
-In enterprise environments, data silos often separate executive financial forecasting from regional operational realities. This project delivers an end-to-end Business Intelligence platform engineered to evaluate high-level organisational performance, isolate multi-year product structural contractions, and identify capital scaling risks over an $18B+ global corporate matrix.
+An end-to-end Power BI solution analyzing an $18B+ retail dataset (Microsoft's Contoso sample data). Built on a single-fact-table star schema, with custom DAX measures for variance analysis, multi-year time intelligence, and automated growth-risk flagging.
 
-### 💡 Business Impact Delivered:
-* **Data Consolidation:** Unified disparate historical and speculative pipelines (`Actuals`, `Budgets`, and `Forecasts`) into a single source of truth, removing reporting latency across cross-functional departments.
-* **Proactive Lifecycle Management:** Identified a hidden **-$634.89M revenue loss** in legacy portfolios, providing stakeholders with clear empirical proof to reallocate capital into higher-margin growth engines.
-* **Automated Risk Oversight:** Deployed automated analytical governance that instantly highlights hyper-growth anomalies exceeding **50% YoY scaling**, allowing operations teams to mitigate downstream supply chain bottlenecks before they manifest.
+## Overview
 
----
+This project evaluates organisational sales performance across the 2017–2019 fiscal periods — covering high-level performance against budget and forecast, product category contribution, year-over-year trend analysis, and two category-level deep dives.
 
-## 🛠️ Data Modeling & Star Schema Architecture
-A core engineering competency demonstrated in this solution is the transformation of decoupled dimensional datasets into a high-performance analytics model.
+![Main Dashboard](./screenshots/main-dashboard.png)
+*Main dashboard — KPI cards, Budget Product Sold, and Budgeted Monthly Amount by category, 2017–2019.*
 
-* **Fact Table:** `FactStrategyPlan` (Consolidates transactional amounts and primary indexing keys).
-* **Dimension Tables:**
-  * `DimProductCategory`: Establishes explicit product taxonomy and hierarchy rules.
-  * `DimEntity`: Maps out parent-child relationships across regional groups, regions, and store locations.
-  * `DimDate`: Custom physical calendar index driving complex time-intelligence filters.
-  * `DimScenario`: Context-control matrix mapping context values (`Actual`, `Budget`, `Forecast`).
+## Data Model
 
-    <img width="592" height="589" alt="image" src="https://github.com/user-attachments/assets/21cfa36c-8a25-4368-8c0a-010963b9ad85" />
+Star schema with the following tables:
 
+- `DimAccount`
+- `DimDate`
+- `DimEntity`
+- `DimProductCategory`
+- `DimScenario`
+- `FactStrategyPlan`
 
-> **Technical Optimisation:** All relationships utilise a strict 1-to-Many ($1 \rightarrow *$) unidirectional layout flowing from dimension boundaries directly into the master fact table. This maximizes the efficiency of the VertiPaQ compression engine, prevents bidirectional filtering ambiguity, and guarantees sub-second visual rendering times.
+All calculations live in a dedicated `_Calculated Measures` folder, keeping the model clean and the logic auditable.
 
----
+## DAX Measures
 
-## Deep-Dive Data Analytics & Core Insights
+| Measure | Purpose |
+|---|---|
+| `Total Strategy Amount` | Base aggregation — `SUM(FactStrategyPlan[Amount])` |
+| `Actual Sales` / `Budgeted Sales` / `Forecasted Sales` | Scenario-filtered variants of Total Strategy Amount via `DimScenario[ScenarioName]` |
+| `Budget Variance` / `Budget Variance %` | Actual vs. Budget, using `DIVIDE()` to guard against divide-by-zero |
+| `Forecast Variance %` | Actual vs. Forecast, same `DIVIDE()` safeguard |
+| `Sales YoY Growth %` | Year-over-year comparison using `SELECTEDVALUE` on the Year column (chosen over `SAMEPERIODLASTYEAR` for robustness against a non-contiguous date table) |
+| `% Change vs 2017 Baseline` | Variance of the current filter context against a fixed 2017 baseline year |
+| `Growth Oversight Alert Flag` | Returns a hex colour (`#FF4D4D` / `#2A9D8F`) consumed directly by conditional formatting, flagging any category with >50% YoY growth |
 
-### 1. High-Level Performance Metrics
-The primary health markers reveal an organisation performing significantly ahead of baseline budgets and revised projections:
-* **Actual Sales:** \$18.34 Billion
-* **Budgeted Sales:** \$17.17 Billion
-* **Forecasted Sales:** \$18.13 Billion
-* **Strategic Variance:** Actual performance outpaced budgeted baselines by **+\$1.17B (+6.81%)** while exceeding final forecasts by **+\$0.21B (+1.16%)**, confirming tight operational control and high predictive model accuracy.
+## Key Findings
 
-### 2. The Data Paradox: Structural Collapse (Cameras & Camcorders)
-* **The Findings:** While the *Cameras and Camcorders* vertical consistently met downscaled internal expectations (+5.48% variance in 2017, +11.76% in 2018, and +3.70% in 2019), trend analytics exposed a deep **-41.2% macro-market contraction**.
-* **The Impact:** Absolute revenue collapsed from **\$1.54B** down to **\$905.11M** within 24 months. This insight flags systemic structural obsolescence (due to external hardware cannibalisation), validating an immediate recommendation to freeze promotional funding and execute a phased inventory rationalisation.
+**High-level performance:** Actual sales of $18.34bn beat budget by +6.81% and forecast by +1.16%, indicating accurate, slightly conservative forecasting.
 
-### 3. Hyper-Scale Expansion & Capital Governance Risks
-* **The Findings:** Conversely, a secondary cross-section within the dataset exposed an emerging portfolio that underwent an unprecedented **936.6% explosion in volume**, spiking from **\$93.97M** (2018) to **\$905.11M** (2019).
-* **The Impact:** While forecasting models aligned perfectly with this scaling event (a minimal 0.30% deviation), the operational safety margin relative to the budget compressed heavily from **+11.62%** down to **+3.71%**. This rapid baseline shift identifies critical downstream supply chain, logistics, and data governance overhead requiring immediate executive oversight.
+**Cameras and Camcorders — structural decline:** Revenue fell from $1,538.40M (2017) to $905.11M (2019), a -41.2% contraction, consistent with market cannibalisation from smartphone cameras. The category still beat its own downscaled budget every year — a reminder that "beating budget" and "growing" are not the same thing.
 
----
+**Audio — sustained high growth:** Audio grew +53% in 2018 and a further +25% in 2019, nearly doubling in absolute revenue over two years ($61.27M → $117.84M). The `Growth Oversight Alert Flag` measure correctly surfaced Audio as the only category crossing the 50% YoY growth threshold in 2018.
 
-## 💻 Technical Mastery & DAX Engineering
-To translate these business insights into interactive dashboard elements, I engineered custom, performant DAX measures that avoid raw column references and optimise filter context modification.
+![Audio Deep Dive](./screenshots/audio-deep-dive.png)
+*Deep Dive page, 2018 — Audio flagged red by the Growth Oversight Alert Flag after posting +53% YoY growth.*
 
-### Single-Fact Table Scenario Isolation
-Instead of requesting separate fact tables for separate data environments, I utilised `CALCULATE` to dynamically split context over the unified `FactStrategyPlan` layout:
-```dax
-Total Strategy Amount = SUM('FactStrategyPlan'[Amount])
+## Data Validation
 
-Actual Sales = 
-CALCULATE(
-    [Total Strategy Amount],
-    'DimScenario'[ScenarioName] = "Actual"
-)
+An earlier version of this project's analysis misattributed 2019 figures from Cameras and Camcorders to a different category, producing an inflated and incorrect growth claim. This was identified during review, traced back to the source data, and corrected — see [Issue #1](../../issues/1) for the full record of what was flagged and how it was resolved. All figures in this README and the accompanying report have been re-verified directly against the Power BI data model.
 
-Budgeted Sales = 
-CALCULATE(
-    [Total Strategy Amount],
-    'DimScenario'[ScenarioName] = "Budget"
-)
-Advanced Longitudinal Drift Calculations
-Code snippet
-Cumulative Decline vs 2017 % = 
-VAR _2017_Sales = CALCULATE([Actual Sales], 'DimDate'[Year] = 2017)
-VAR _Current_Sales = [Actual Sales]
-RETURN 
-    DIVIDE(_Current_Sales - _2017_Sales, _2017_Sales, 0)
-Automated Risk Governance Rule (Hex Color Switch)
-Code snippet
-Growth Oversight Alert Flag = 
-IF(
-    [Sales YoY Growth %] > 0.50, 
-    "#FF4D4D", // Automated Alert Red for high-risk scaling (>50% YoY)
-    "#2A9D8F"  // Steady-state Teal for standard corporate tracking
-)
+## Report
+
+The full written analysis, including deep-dive tables and strategic recommendations, is available here: [Consolidated Executive Sales Analysis Report](./Consolidated_Executive_Sales_Analysis_Report_Corrected.docx)
+
+## Tools
+
+Power BI Desktop · DAX · Star schema data modelling
