@@ -1,12 +1,13 @@
 # Corporate Sales Performance BI Intelligence
 
-An end-to-end Power BI solution analyzing an $18B+ retail dataset (Microsoft's Contoso sample data). Built on a single-fact-table star schema, with custom DAX measures for variance analysis, multi-year time intelligence, and automated growth-risk flagging.
+An end-to-end Power BI solution analysing an $18B+ retail dataset (Microsoft's Contoso sample data). Built on a single-fact-table star schema, with custom DAX measures for variance analysis, multi-year time intelligence, and automated growth-risk flagging.
 
 ## Overview
 
 This project evaluates organisational sales performance across the 2017–2019 fiscal periods — covering high-level performance against budget and forecast, product category contribution, year-over-year trend analysis, and two category-level deep dives.
 
-![Main Dashboard](./screenshots/main-dashboard.png)
+<img width="1243" height="706" alt="Main dashboard" src="https://github.com/user-attachments/assets/8d408728-2822-479a-af83-8c8724630a3e" />
+
 *Main dashboard — KPI cards, Budget Product Sold, and Budgeted Monthly Amount by category, 2017–2019.*
 
 ## Data Model
@@ -42,7 +43,9 @@ All calculations live in a dedicated `_Calculated Measures` folder, keeping the 
 
 **Audio — sustained high growth:** Audio grew +53% in 2018 and a further +25% in 2019, nearly doubling in absolute revenue over two years ($61.27M → $117.84M). The `Growth Oversight Alert Flag` measure correctly surfaced Audio as the only category crossing the 50% YoY growth threshold in 2018.
 
-![Audio Deep Dive](./screenshots/audio-deep-dive.png)
+<img width="1239" height="692" alt="deepdive_dashboard" src="https://github.com/user-attachments/assets/9f64a607-5215-4b07-b07b-65297e2466ba" />
+
+
 *Deep Dive page, 2018 — Audio flagged red by the Growth Oversight Alert Flag after posting +53% YoY growth.*
 
 ## Data Validation
